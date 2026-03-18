@@ -7,7 +7,7 @@ const ORDER_FIELDS = ['so_number','log_number','po_number','customer_id','salesp
   'suffocation_warning','pre_ticket','pre_pack','pre_pack_label','pre_pack_details',
   'cards_hangers','cards_hangers_brand','sewn_in_label','testing_required','testing_procedure',
   'ship_direct_nj','ship_direct_la','ship_fob_dtc','in_stock_order','closeout_order',
-  'top_samples','pre_production_samples','other_notes'];
+  'top_samples','pre_production_samples','other_notes','parent_blanket_id'];
 
 const TRACKED_FIELDS = ['po_number','so_number','ship_date','cancel_date','mabd','status','salesperson'];
 
@@ -124,14 +124,14 @@ router.post('/', (req, res) => {
           suffocation_warning, pre_ticket, pre_pack, pre_pack_label, pre_pack_details,
           cards_hangers, cards_hangers_brand, sewn_in_label, testing_required, testing_procedure,
           ship_direct_nj, ship_direct_la, ship_fob_dtc, in_stock_order, closeout_order,
-          top_samples, pre_production_samples, other_notes
+          top_samples, pre_production_samples, other_notes, parent_blanket_id
         ) VALUES (
           @so_number, @log_number, @po_number, @customer_id, @salesperson, @entered_by,
           @order_date, @ship_date, @cancel_date, @mabd, @status,
           @suffocation_warning, @pre_ticket, @pre_pack, @pre_pack_label, @pre_pack_details,
           @cards_hangers, @cards_hangers_brand, @sewn_in_label, @testing_required, @testing_procedure,
           @ship_direct_nj, @ship_direct_la, @ship_fob_dtc, @in_stock_order, @closeout_order,
-          @top_samples, @pre_production_samples, @other_notes
+          @top_samples, @pre_production_samples, @other_notes, @parent_blanket_id
         )
       `).run({
         so_number: d.so_number || null, log_number: d.log_number || '',
@@ -151,6 +151,7 @@ router.post('/', (req, res) => {
         closeout_order: d.closeout_order ?? 0, top_samples: d.top_samples ?? 1,
         pre_production_samples: d.pre_production_samples ?? 0,
         other_notes: d.other_notes || '',
+        parent_blanket_id: d.parent_blanket_id || null,
       });
       const newId = r.lastInsertRowid;
       insertLines(db, newId, d.lines);
@@ -188,7 +189,7 @@ router.put('/:id', (req, res) => {
           ship_direct_la=@ship_direct_la, ship_fob_dtc=@ship_fob_dtc,
           in_stock_order=@in_stock_order, closeout_order=@closeout_order,
           top_samples=@top_samples, pre_production_samples=@pre_production_samples,
-          other_notes=@other_notes
+          other_notes=@other_notes, parent_blanket_id=@parent_blanket_id
         WHERE id=@id
       `).run({
         id: req.params.id,
@@ -209,6 +210,7 @@ router.put('/:id', (req, res) => {
         closeout_order: d.closeout_order ?? 0, top_samples: d.top_samples ?? 1,
         pre_production_samples: d.pre_production_samples ?? 0,
         other_notes: d.other_notes || '',
+        parent_blanket_id: d.parent_blanket_id || null,
       });
 
       // Replace lines

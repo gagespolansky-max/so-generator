@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getCustomers, getStyles, getOrder, getOrders, createOrder, updateOrder, exportOrder, updateOrderStatus, getOrderChanges } from '../services/api';
+import CommentWidget from '../components/CommentWidget';
 
 // ── Week number utility ──────────────────────────────────────────────────────
 function getWeekNumber(date) {
@@ -1109,6 +1110,7 @@ function Step4({ form, styleGroups, customers, savedOrderId, onSave, onExport, o
 export default function CreateOrder() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const isEdit = !!id;
 
   const [step, setStep] = useState(1);
@@ -1157,7 +1159,8 @@ export default function CreateOrder() {
     closeout_order: 0,
     top_samples: 1,
     pre_production_samples: 0,
-    other_notes: ''
+    other_notes: '',
+    parent_blanket_id: null,
   });
 
   const [styleGroups, setStyleGroups] = useState([]);
@@ -1174,6 +1177,19 @@ export default function CreateOrder() {
         setCustomers(custs);
         setStyles(stylesData);
         setExistingOrders(ordersData);
+
+        // Handle blanket order query params (new release flow)
+        if (!isEdit) {
+          const blanketId = searchParams.get('blanket_id');
+          const custId = searchParams.get('customer_id');
+          if (blanketId || custId) {
+            setForm(prev => ({
+              ...prev,
+              parent_blanket_id: blanketId ? parseInt(blanketId) : null,
+              customer_id: custId ? parseInt(custId) : prev.customer_id,
+            }));
+          }
+        }
 
         if (isEdit) {
           const order = await getOrder(id);
@@ -1209,7 +1225,8 @@ export default function CreateOrder() {
             closeout_order: order.closeout_order ?? 0,
             top_samples: order.top_samples ?? 1,
             pre_production_samples: order.pre_production_samples ?? 0,
-            other_notes: order.other_notes || ''
+            other_notes: order.other_notes || '',
+            parent_blanket_id: order.parent_blanket_id || null,
           });
 
           // Reconstruct style groups from lines
@@ -1445,6 +1462,7 @@ export default function CreateOrder() {
 
         {/* Navigation */}
         <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
+
           <button
             type="button"
             onClick={() => setStep(s => Math.max(1, s - 1))}
@@ -1488,6 +1506,12 @@ export default function CreateOrder() {
           </div>
         </div>
       </div>
+
+      <CommentWidget
+        orderId={savedOrderId}
+        styleGroups={styleGroups}
+        currentUser={form.salesperson || form.entered_by || 'You'}
+      />
     </div>
   );
 }

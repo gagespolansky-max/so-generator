@@ -7,6 +7,8 @@ import CreateOrder from './pages/CreateOrder';
 import StyleCatalog from './pages/StyleCatalog';
 import Customers from './pages/Customers';
 import Admin from './pages/Admin';
+import BlanketOrders from './pages/BlanketOrders';
+import BlanketOrderDetail from './pages/BlanketOrderDetail';
 
 export default function App() {
   return (
@@ -18,6 +20,8 @@ export default function App() {
           <Route path="/orders/new" element={<CreateOrder />} />
           <Route path="/orders/:id/edit" element={<CreateOrder />} />
           <Route path="/styles" element={<StyleCatalog />} />
+          <Route path="/blanket-orders" element={<BlanketOrders />} />
+          <Route path="/blanket-orders/:id" element={<BlanketOrderDetail />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/admin" element={<Admin />} />
         </Route>

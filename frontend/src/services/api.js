@@ -47,4 +47,21 @@ export const suggestHTS = (params) => api.get('/hts/suggest', { params }).then(r
 export const getHTSCode = (code) => api.get(`/hts/${encodeURIComponent(code)}`).then(r => r.data);
 export const getOrderChanges = (id) => api.get(`/orders/${id}/changes`).then(r => r.data);
 
+// Comments
+export const getComments = (orderId) => api.get(`/comments/${orderId}`).then(r => r.data);
+export const addComment = (orderId, data) => api.post(`/comments/${orderId}`, data).then(r => r.data);
+export const resolveComment = (orderId, commentId, resolved_by) =>
+  api.patch(`/comments/${orderId}/${commentId}/resolve`, { resolved_by }).then(r => r.data);
+export const deleteComment = (orderId, commentId) =>
+  api.delete(`/comments/${orderId}/${commentId}`).then(r => r.data);
+
+// Blanket Orders
+export const getBlanketOrders = (params) => api.get('/blanket-orders', { params }).then(r => r.data);
+export const getBlanketOrder = (id) => api.get(`/blanket-orders/${id}`).then(r => r.data);
+export const createBlanketOrder = (data) => api.post('/blanket-orders', data).then(r => r.data);
+export const updateBlanketOrder = (id, data) => api.put(`/blanket-orders/${id}`, data).then(r => r.data);
+export const deleteBlanketOrder = (id) => api.delete(`/blanket-orders/${id}`).then(r => r.data);
+export const updateBlanketOrderStatus = (id, status) =>
+  api.patch(`/blanket-orders/${id}/status`, { status }).then(r => r.data);
+
 export default api;

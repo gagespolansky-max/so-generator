@@ -5,6 +5,7 @@ export default function Layout() {
   const navLinks = [
     { to: '/', label: 'Dashboard', end: true },
     { to: '/orders', label: 'Orders' },
+    { to: '/blanket-orders', label: 'Master Orders' },
     { to: '/styles', label: 'Styles' },
     { to: '/customers', label: 'Customers' },
     { to: '/admin', label: 'Admin' },

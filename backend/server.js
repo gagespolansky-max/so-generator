@@ -6,11 +6,13 @@ app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174', 'http:
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/styles',    require('./routes/styles'));
-app.use('/api/customers', require('./routes/customers'));
-app.use('/api/orders',    require('./routes/orders'));
-app.use('/api/export',    require('./routes/export'));
-app.use('/api/hts',       require('./routes/hts'));
+app.use('/api/styles',         require('./routes/styles'));
+app.use('/api/customers',      require('./routes/customers'));
+app.use('/api/orders',         require('./routes/orders'));
+app.use('/api/export',         require('./routes/export'));
+app.use('/api/hts',            require('./routes/hts'));
+app.use('/api/comments',       require('./routes/comments'));
+app.use('/api/blanket-orders', require('./routes/blanket-orders'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', db: 'sqlite', time: new Date().toISOString() }));
 
@@ -21,7 +23,14 @@ app.get('/api/stats', (req, res) => {
   const orderRows = db.prepare('SELECT status, COUNT(*) as n FROM orders GROUP BY status').all();
   const orders = { draft: 0, confirmed: 0, exported: 0, total: 0 };
   for (const row of orderRows) { orders[row.status] = row.n; orders.total += row.n; }
-  res.json({ totalStyles, orders });
+
+  const boRows = db.prepare('SELECT status, COUNT(*) as n FROM blanket_orders GROUP BY status').all();
+  const blanketOrders = { open: 0, partial: 0, fulfilled: 0, closed: 0, total: 0 };
+  for (const row of boRows) { blanketOrders[row.status] = row.n; blanketOrders.total += row.n; }
+
+  const unresolvedComments = db.prepare('SELECT COUNT(*) as n FROM order_comments WHERE resolved=0').get().n;
+
+  res.json({ totalStyles, orders, blanketOrders, unresolvedComments });
 });
 
 require('./db/schema').getDb();

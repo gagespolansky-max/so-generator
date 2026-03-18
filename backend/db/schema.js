@@ -136,6 +136,44 @@ function initSchema() {
       summary TEXT,
       diff_json TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS order_comments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      author TEXT NOT NULL DEFAULT 'Anonymous',
+      body TEXT NOT NULL,
+      line_style_number TEXT DEFAULT NULL,
+      mentions TEXT DEFAULT '[]',
+      resolved INTEGER DEFAULT 0,
+      resolved_by TEXT DEFAULT NULL,
+      resolved_at DATETIME DEFAULT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS blanket_orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      po_number TEXT DEFAULT '',
+      customer_id INTEGER REFERENCES customers(id),
+      description TEXT DEFAULT '',
+      salesperson TEXT DEFAULT '',
+      total_committed_qty INTEGER DEFAULT 0,
+      cancel_date_start TEXT DEFAULT '',
+      cancel_date_end TEXT DEFAULT '',
+      status TEXT DEFAULT 'open' CHECK(status IN ('open','partial','fulfilled','closed')),
+      notes TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS blanket_order_lines (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      blanket_order_id INTEGER NOT NULL REFERENCES blanket_orders(id) ON DELETE CASCADE,
+      style_number TEXT DEFAULT '',
+      color TEXT DEFAULT '',
+      total_qty INTEGER DEFAULT 0,
+      sell_price REAL DEFAULT 0,
+      first_cost REAL DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   // Safe migrations for existing databases
@@ -147,6 +185,8 @@ function initSchema() {
   addCol('styles', 'hts_code', 'TEXT DEFAULT ""');
   addCol('styles', 'tariff3_pct', 'REAL DEFAULT 0');
   addCol('order_lines', 'tariff3_pct', 'REAL DEFAULT 0');
+  addCol('order_lines', 'price_snapshot_date', 'TEXT DEFAULT NULL');
+  addCol('orders', 'parent_blanket_id', 'INTEGER REFERENCES blanket_orders(id) DEFAULT NULL');
 }
 
 module.exports = { getDb };
