@@ -117,8 +117,8 @@ export default function BlanketOrderDetail() {
       <div className="flex items-start justify-between mb-6">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <button onClick={() => navigate('/blanket-orders')} className="text-gray-400 hover:text-gray-600 text-sm">
-              ← Master Orders
+            <button onClick={() => navigate('/orders')} className="text-gray-400 hover:text-gray-600 text-sm">
+              &larr; Orders
             </button>
           </div>
           <div className="flex items-center gap-3">
@@ -152,6 +152,12 @@ export default function BlanketOrderDetail() {
               <option value="closed">Closed</option>
             </select>
           </div>
+          <button
+            onClick={() => navigate(`/blanket-orders/${id}/edit`)}
+            className="btn-secondary text-sm"
+          >
+            Edit
+          </button>
         </div>
       </div>
 
